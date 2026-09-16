@@ -428,6 +428,92 @@
     margin: 16px auto 0;
     opacity:0.5;
   }
+  /* ---------- Guestbook Section ---------- */
+  .guestbook-card {
+    background: var(--card);
+    border-radius: 30px;
+    padding: 34px 26px;
+    border: 1.5px dashed var(--line);
+    position: relative;
+    margin-top: 40px;
+  }
+  .guestbook-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .guestbook-input, .guestbook-textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    font-family: 'Gowun Dodum', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: #FFF;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .guestbook-input:focus, .guestbook-textarea:focus {
+    border-color: var(--rose-deep);
+  }
+  .guestbook-textarea {
+    resize: none;
+    height: 90px;
+  }
+  .guestbook-submit {
+    background: var(--rose-deep);
+    color: #fff;
+    border: none;
+    padding: 12px 0;
+    border-radius: 999px;
+    font-family: 'Gowun Dodum', sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 6px 16px -4px rgba(179, 112, 108, 0.4);
+    transition: background 0.2s, transform 0.1s;
+  }
+  .guestbook-submit:active {
+    transform: scale(0.98);
+  }
+  .guestbook-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .guestbook-item {
+    background: var(--bg);
+    padding: 14px 18px;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+  }
+  .guestbook-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .guestbook-item-author {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--rose-deep);
+  }
+  .guestbook-item-date {
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+  .guestbook-item-content {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ink);
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
 </style>
 </head>
 <body>
@@ -536,6 +622,19 @@
 
   <div class="section">
     <div class="section-inner">
+      <!-- Guestbook Section -->
+  <div class="guestbook-card">
+    <div class="info-title">방명록</div>
+    <form id="guestbookForm" class="guestbook-form">
+      <input type="text" id="guestName" class="guestbook-input" placeholder="작성자 이름" required maxLength="20">
+      <textarea id="guestMessage" class="guestbook-textarea" placeholder="태안이에게 축하의 메시지를 남겨주세요!" required maxLength="200"></textarea>
+      <button type="submit" class="guestbook-submit">축하 메시지 남기기</button>
+    </form>
+
+    <div id="guestbookList" class="guestbook-list">
+      <!-- Guestbook items will be rendered here dynamically -->
+    </div>
+  </div>
       <div class="dday-card">
         <div class="dday-label">태안이의 첫 생일까지</div>
         <div class="dday-number" id="ddayNumber">D-00</div>
@@ -560,7 +659,8 @@
     <div class="baby-name">사랑스러운 태안이의 첫 돌 🎂</div>
   </div>
 
-</div>
+</div
+  
 
 <div class="lightbox" id="lightbox">
   <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
@@ -595,77 +695,6 @@
   let audioCtx = null;
   let isPlaying = false;
   let timerId = null;
-
-  // 아기자기하고 통통 튀는 오리지널 멜로디 (도-레-미-솔-라 5음 음계, 실로폰+우쿨렐레 느낌)
-  const NOTES = {
-    C3:130.81, G3:196.00, A3:220.00,
-    C4:261.63, D4:293.66, E4:329.63, G4:392.00, A4:440.00,
-    C5:523.25, D5:587.33, E5:659.25
-  };
-
-  // 실로폰 멜로디 (통통 튀는 8분음표 위주)
-  const melody = [
-    ['C4',0.22],['E4',0.22],['G4',0.22],['C5',0.22],
-    ['D5',0.22],['C5',0.22],['A4',0.22],['G4',0.22],
-    ['E4',0.22],['G4',0.22],['A4',0.22],['C5',0.22],
-    ['G4',0.42],['REST',0.20],['E4',0.22],['G4',0.20],
-
-    ['D4',0.22],['E4',0.22],['G4',0.22],['A4',0.22],
-    ['G4',0.22],['E4',0.22],['D4',0.22],['C4',0.22],
-    ['E4',0.22],['G4',0.22],['C5',0.22],['E5',0.22],
-    ['D5',0.42],['C5',0.42],['REST',0.6]
-  ];
-
-  // 우쿨렐레 느낌의 통통 튀는 베이스 (멜로디를 받쳐주는 저음 핑크)
-  const bassLine = [
-    ['C3',0.44],['G3',0.44],['C3',0.44],['G3',0.44],
-    ['A3',0.44],['G3',0.44],['C3',0.44],['G3',0.44],
-    ['C3',0.44],['G3',0.44],['A3',0.44],['G3',0.44],
-    ['C3',0.84],['G3',0.84],['REST',0.8]
-  ];
-
-  function playNote(freq, startTime, duration){
-    // 메인 톤 (실로폰 느낌의 트라이앵글 웨이브)
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(freq, startTime);
-    gain.gain.setValueAtTime(0, startTime);
-    gain.gain.linearRampToValueAtTime(0.24, startTime + 0.015);
-    gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start(startTime);
-    osc.stop(startTime + duration + 0.05);
-
-    // 살짝 반짝이는 배음 (한 옥타브 위, 여린 사인파)
-    const osc2 = audioCtx.createOscillator();
-    const gain2 = audioCtx.createGain();
-    osc2.type = 'sine';
-    osc2.frequency.setValueAtTime(freq * 2, startTime);
-    gain2.gain.setValueAtTime(0, startTime);
-    gain2.gain.linearRampToValueAtTime(0.07, startTime + 0.01);
-    gain2.gain.exponentialRampToValueAtTime(0.001, startTime + duration * 0.65);
-    osc2.connect(gain2);
-    gain2.connect(audioCtx.destination);
-    osc2.start(startTime);
-    osc2.stop(startTime + duration + 0.05);
-  }
-
-  function playPluck(freq, startTime, duration){
-    // 통통 튀는 우쿨렐레풍 저음 핑크
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(freq, startTime);
-    gain.gain.setValueAtTime(0, startTime);
-    gain.gain.linearRampToValueAtTime(0.14, startTime + 0.008);
-    gain.gain.exponentialRampToValueAtTime(0.001, startTime + Math.min(duration, 0.5));
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start(startTime);
-    osc.stop(startTime + duration + 0.05);
-  }
 
   function scheduleLoop(){
     if(!isPlaying) return;
@@ -795,7 +824,105 @@ document.addEventListener('pointerdown', function firstTouch() {
     document.removeEventListener('pointerdown', firstTouch);
 }, { once: true });
 </script>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
+<script>
+  // Replace this with your actual Firebase project configuration
+  const firebaseConfig = {// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyCPjWg-fON6q0CxgefoiuN96XIsYKu-ky0",
+  authDomain: "stt-b3ad0.firebaseapp.com",
+  databaseURL: "https://stt-b3ad0-default-rtdb.firebaseio.com",
+  projectId: "stt-b3ad0",
+  storageBucket: "stt-b3ad0.firebasestorage.app",
+  messagingSenderId: "769373993948",
+  appId: "1:769373993948:web:cc3fc353b082a1739ded19",
+  measurementId: "G-V3Q3NQGLLX"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
+  const guestbookRef = database.ref('guestbook');
+
+  // Utility to prevent XSS attacks
+  function escapeHTML(str) {
+    return str.replace(/[&<>'"]/g, 
+      tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+    );
+  }
+
+  // Handle Form Submission
+  document.getElementById('guestbookForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const nameInput = document.getElementById('guestName');
+    const messageInput = document.getElementById('guestMessage');
+    
+    const name = nameInput.value.trim();
+    const message = messageInput.value.trim();
+    
+    if (name && message) {
+      const newPostRef = guestbookRef.push();
+      newPostRef.set({
+        name: name,
+        message: message,
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+      }).then(() => {
+        nameInput.value = '';
+        messageInput.value = '';
+      }).catch((error) => {
+        alert('메시지 저장 실패: ' + error.message);
+      });
+    }
+  });
+
+  // Fetch and display messages in Realtime
+  guestbookRef.orderByChild('timestamp').on('value', (snapshot) => {
+    const listElement = document.getElementById('guestbookList');
+    listElement.innerHTML = '';
+    
+    const posts = [];
+    snapshot.forEach((childSnapshot) => {
+      posts.push(childSnapshot.val());
+    });
+
+    // Display newest messages first
+    posts.reverse().forEach((post) => {
+      const date = post.timestamp ? new Date(post.timestamp).toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      }) : '';
+
+      const itemHtml = `
+        <div class="guestbook-item">
+          <div class="guestbook-item-header">
+            <span class="guestbook-item-author">${escapeHTML(post.name)}</span>
+            <span class="guestbook-item-date">${date}</span>
+          </div>
+          <div class="guestbook-item-content">${escapeHTML(post.message)}</div>
+        </div>
+      `;
+      listElement.innerHTML += itemHtml;
+    });
+  });
+</script>
+  
 </body>
 </html>
 </body>
