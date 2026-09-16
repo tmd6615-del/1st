@@ -750,5 +750,53 @@
   update();
 })();
 </script>
+  </script>
+
+<audio id="bgMusic" src="birthday.mp3" loop preload="auto"></audio>
+
+<script>
+const bgMusic = document.getElementById('bgMusic');
+const musicBtn = document.getElementById('musicBtn');
+
+bgMusic.volume = 0.35;
+
+function toggleMusic() {
+    if (bgMusic.paused) {
+        bgMusic.play()
+            .then(() => {
+                musicBtn.setAttribute('aria-label', '배경음악 끄기');
+                musicBtn.classList.add('playing');
+            })
+            .catch((error) => {
+                console.error('배경음악 재생 실패:', error);
+            });
+    } else {
+        bgMusic.pause();
+        musicBtn.setAttribute('aria-label', '배경음악 재생');
+        musicBtn.classList.remove('playing');
+    }
+}
+
+function startMusic() {
+    if (bgMusic.paused) {
+        bgMusic.play()
+            .then(() => {
+                musicBtn.setAttribute('aria-label', '배경음악 끄기');
+                musicBtn.classList.add('playing');
+            })
+            .catch(() => {
+                console.log('사용자 터치 후 음악을 재생할 수 있습니다.');
+            });
+    }
+}
+
+document.addEventListener('pointerdown', function firstTouch() {
+    startMusic();
+    document.removeEventListener('pointerdown', firstTouch);
+}, { once: true });
+</script>
+
+</body>
+</html>
 </body>
 </html>
