@@ -392,96 +392,41 @@
     50% { transform: scaleY(1); }
   }
 
-  /* ---------- Guestbook ---------- */
-  .gb-title{
-    text-align:center;
-    font-family:'Gaegu', cursive;
-    font-weight:700;
-    font-size: 24px;
-    color: var(--rose-deep);
-    margin-bottom: 6px;
-  }
-  .gb-sub{
-    text-align:center;
-    font-size:13px;
-    color: var(--ink-soft);
-    margin-bottom: 22px;
-  }
-  .gb-form{
+  /* ---------- D-day countdown ---------- */
+  .dday-card{
     background: var(--card);
-    border-radius: 26px;
+    border-radius: 30px;
     border: 1.5px dashed var(--line);
-    padding: 22px 20px;
-    margin-bottom: 22px;
-  }
-  .gb-form input,
-  .gb-form textarea{
-    width:100%;
-    font-family:'Gowun Dodum', sans-serif;
-    font-size:14.5px;
-    color: var(--ink);
-    background: #FDFAF5;
-    border: 1.5px solid #EEE1CF;
-    border-radius: 14px;
-    padding: 11px 14px;
-    margin-bottom: 10px;
-    outline:none;
-  }
-  .gb-form input:focus,
-  .gb-form textarea:focus{
-    border-color: var(--rose);
-  }
-  .gb-form textarea{
-    resize:none;
-    min-height: 72px;
-    line-height:1.6;
-  }
-  .gb-submit{
-    display:block;
-    width:100%;
-    border:none;
-    padding: 12px 0;
-    background: var(--rose-deep);
-    color:#fff;
-    font-family:'Gaegu', cursive;
-    font-weight:700;
-    font-size:16px;
-    border-radius: 999px;
-    cursor:pointer;
-    box-shadow: 0 8px 18px -8px rgba(179,112,108,0.7);
-  }
-  .gb-submit:active{ transform: scale(0.98); }
-  .gb-list{
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-  }
-  .gb-entry{
-    background: var(--card);
-    border-radius: 18px;
-    padding: 14px 16px;
-    border: 1px solid #F0E6D8;
-    position:relative;
-  }
-  .gb-entry .gb-name{
-    font-family:'Gaegu', cursive;
-    font-weight:700;
-    font-size:15.5px;
-    color: var(--rose-deep);
-    margin-bottom:4px;
-  }
-  .gb-entry .gb-msg{
-    font-size:14px;
-    line-height:1.7;
-    color: var(--ink);
-    word-break:keep-all;
-    white-space:pre-wrap;
-  }
-  .gb-empty{
+    padding: 34px 20px;
     text-align:center;
-    font-size:13.5px;
+    position:relative;
+    overflow:hidden;
+  }
+  .dday-label{
+    font-family:'Gaegu', cursive;
+    font-weight:700;
+    font-size: 19px;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+  .dday-number{
+    font-family:'Gaegu', cursive;
+    font-weight:700;
+    font-size: 56px;
+    color: var(--rose-deep);
+    line-height:1.1;
+    margin-bottom: 10px;
+    text-shadow: 0 3px 0 rgba(204,142,138,0.15);
+  }
+  .dday-date{
+    font-size: 13.5px;
     color: var(--ink-soft);
-    padding: 18px 0;
+    letter-spacing:0.5px;
+  }
+  .dday-paws{
+    width: 34px;
+    margin: 16px auto 0;
+    opacity:0.5;
   }
 </style>
 </head>
@@ -591,17 +536,13 @@
 
   <div class="section">
     <div class="section-inner">
-      <div class="gb-title">태안이에게 한마디 💌</div>
-      <div class="gb-sub">축하 인사를 남겨주시면 태안이가 소중히 간직할게요</div>
-
-      <div class="gb-form">
-        <input type="text" id="gbName" placeholder="이름을 남겨주세요" maxlength="20">
-        <textarea id="gbMsg" placeholder="태안이에게 축하 한마디를 남겨주세요 :)" maxlength="200"></textarea>
-        <button class="gb-submit" onclick="submitGuestbook()">방명록 남기기</button>
-      </div>
-
-      <div class="gb-list" id="gbList">
-        <div class="gb-empty" id="gbEmpty">아직 남겨진 메시지가 없어요. 첫 축하 인사를 남겨주세요!</div>
+      <div class="dday-card">
+        <div class="dday-label">태안이의 첫 생일까지</div>
+        <div class="dday-number" id="ddayNumber">D-00</div>
+        <div class="dday-date">2026년 10월 10일 토요일</div>
+        <div class="dday-paws">
+          <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="26" r="9" fill="#CC8E8A"/><circle cx="8" cy="14" r="5" fill="#CC8E8A"/><circle cx="20" cy="9" r="5" fill="#CC8E8A"/><circle cx="32" cy="14" r="5" fill="#CC8E8A"/></svg>
+        </div>
       </div>
     </div>
   </div>
@@ -793,69 +734,20 @@
 
 <script>
 (function(){
-  const listEl = document.getElementById('gbList');
-  const emptyEl = document.getElementById('gbEmpty');
-  let entries = [];
-
-  function renderEntries(){
-    listEl.innerHTML = '';
-    if(entries.length === 0){
-      listEl.appendChild(emptyEl);
-      return;
+  const target = new Date('2026-10-10T11:30:00+09:00').getTime();
+  const el = document.getElementById('ddayNumber');
+  function update(){
+    const now = new Date().getTime();
+    const diffDays = Math.ceil((target - now) / (1000 * 60 * 60 * 24));
+    if(diffDays > 0){
+      el.textContent = 'D-' + diffDays;
+    } else if(diffDays === 0){
+      el.textContent = 'D-DAY';
+    } else {
+      el.textContent = '축하합니다 \uD83C\uDF89';
     }
-    entries.slice().reverse().forEach(function(e){
-      const div = document.createElement('div');
-      div.className = 'gb-entry';
-      const nameDiv = document.createElement('div');
-      nameDiv.className = 'gb-name';
-      nameDiv.textContent = e.name;
-      const msgDiv = document.createElement('div');
-      msgDiv.className = 'gb-msg';
-      msgDiv.textContent = e.message;
-      div.appendChild(nameDiv);
-      div.appendChild(msgDiv);
-      listEl.appendChild(div);
-    });
   }
-
-  async function loadEntries(){
-    try{
-      const res = await window.storage.get('guestbook-entries-v2', true);
-      if(res && res.value){
-        entries = JSON.parse(res.value);
-      }
-    }catch(err){
-      entries = [];
-    }
-    renderEntries();
-  }
-
-  window.submitGuestbook = async function(){
-    const nameInput = document.getElementById('gbName');
-    const msgInput = document.getElementById('gbMsg');
-    const name = nameInput.value.trim();
-    const message = msgInput.value.trim();
-    if(!name || !message){
-      alert('이름과 메시지를 모두 입력해주세요.');
-      return;
-    }
-    const entry = { name: name, message: message, date: new Date().toISOString() };
-    entries.push(entry);
-    renderEntries();
-    nameInput.value = '';
-    msgInput.value = '';
-    try{
-      await window.storage.set('guestbook-entries-v2', JSON.stringify(entries), true);
-    }catch(err){
-      /* storage unavailable in this environment - entry stays visible for this session only */
-    }
-  };
-
-  if (window.storage) {
-    loadEntries();
-  } else {
-    renderEntries();
-  }
+  update();
 })();
 </script>
 </body>
